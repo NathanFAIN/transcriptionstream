@@ -58,8 +58,8 @@ for sub_dir in "${sub_dirs[@]}"; do
             mv "$incoming_dir$base_name"* "$new_dir/"
 
             # Create the summary.txt file from the newly created srt file by sending it to ts-gpt or another ollama api endpoint
-            # ts-gpt can be enabled in the docker-compose.yml - if using ts-gpt, your url should be http://172.30.1.3:11434
-            python3 /root/scripts/ts-summarize.py "$new_dir" http://172.30.1.3:11434
+            # ts-gpt can be enabled in the docker-compose.yml - if using ts-gpt, your url should be http://172.30.1.3:11435
+            python3 /root/scripts/ts-summarize.py "$new_dir" http://172.30.1.3:11435
 
             # Change the owner of the files to the user transcriptionstream
             chown -R transcriptionstream:transcriptionstream "$new_dir"

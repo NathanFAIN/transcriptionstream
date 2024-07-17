@@ -56,7 +56,7 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
    # Get the model installed on ts-gpt (requires curl)
    # only if ollama is enabled in docker-compose.yaml
     echo "Downloading  transcriptionstream mistral model"   
-    curl -X POST http://172.30.1.3:11434/api/pull -d '{"name": "transcriptionstream/transcriptionstream"}'
+    curl -X POST http://172.30.1.3:11435/api/pull -d '{"name": "transcriptionstream/transcriptionstream"}'
 
     # Re-attach to compose logs
     echo "Re-attaching to console logs"

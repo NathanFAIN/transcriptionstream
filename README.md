@@ -79,7 +79,7 @@ chmod +x run.sh;
 ### Ports
 - **SSH:** 22222
 - **HTTP:** 5006
-- **Ollama:** 11434
+- **Ollama:** 11435
 - **Meilisearch:** 7700
 
 ### SSH Server Access

@@ -80,7 +80,7 @@ services:
     image: ollama/ollama
     container_name: ts-gpt
     ports:
-      - "11434:11434"
+      - "11434:11435"
     volumes:
       - transcriptionstream:/root/.ollama
     networks:
