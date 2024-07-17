@@ -9,9 +9,6 @@
 process1="transcribe_example.sh"
 maxConcurrentRuns1=$MAX_CONCURRENT_TRANSFORMS  # Maximum concurrent runs for process1
 
-process2="auto-summary.py"
-maxConcurrentRuns2=$MAX_CONCURRENT_SUMMARYS  # Maximum concurrent runs for process2
-
 # Delay between starting each script (in seconds)
 delayBetweenStarts=10
 
@@ -43,9 +40,6 @@ while true
 do
   # Check and start process1 if allowed
   start_process_if_allowed $process1 $maxConcurrentRuns1
-
-  # Check and start process2 if allowed
-  start_process_if_allowed $process2 $maxConcurrentRuns2
 
   # Sleep for a short duration before checking again
   sleep 5

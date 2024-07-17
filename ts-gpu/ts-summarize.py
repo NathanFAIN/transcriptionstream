@@ -30,19 +30,19 @@ with open(txt_file_path, 'r', encoding='utf-8') as file:
 
 # The text for the prompt
 prompt_text = f"""
-Summarize the transcription below. Be sure to include pertinent information about the speakers, including name and anything else shared.
-Provide the summary output in the following style
+Résumez la transcription ci-dessous en francais. Veillez à inclure des informations pertinentes sur les intervenants, y compris leur nom et tout ce qui a été partagé.
+Le résumé doit être rédigé dans le style suivant
 
-Speakers: names or identifiers of speaking parties
-Topics: topics included in the transcription
-Ideas: any ideas that may have been mentioned
-Dates: dates mentioned and what they correspond to
-Locations: any locations mentioned
-Action Items: any action items
+Intervenants : noms ou identifiants des intervenants
+Sujets : sujets inclus dans la transcription
+Idées : toutes les idées qui ont pu être mentionnées
+Dates : dates mentionnées et ce à quoi elles correspondent
+Lieux : tous les lieux mentionnés
+Actions : toutes les actions à entreprendre
 
-Summary: overall summary of the transcription
+Résumé : résumé général de la transcription
 
-The transcription is as follows
+La transcription est la suivante
 
 {transcription_text}
 

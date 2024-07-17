@@ -43,24 +43,23 @@ for sub_dir in "${sub_dirs[@]}"; do
             if [ "$sub_dir" == "diarize" ]; then
                 echo "--- diarizing $audio_file..." >> /proc/1/fd/1
                 diarize_start_time=$(date +%s)
-                python3 diarize_parallel.py --batch-size 16 --whisper-model $DIARIZATION_MODEL --language en -a "$audio_file"
+                python3 diarize_parallel.py --batch-size 16 --whisper-model $DIARIZATION_MODEL --language fr -a "$audio_file"
                 diarize_end_time=$(date +%s)
                 run_time=$((diarize_end_time - diarize_start_time))
             elif [ "$sub_dir" == "transcribe" ]; then
                 echo "--- transcribing $audio_file..." >> /proc/1/fd/1
-                        whisper_start_time=$(date +%s)
-                whisperx --batch_size 12 --model $TRANSCRIPTION_MODEL --language en --output_dir "$new_dir" > "$new_dir/$base_name.txt" "$audio_file"
-                        whisper_end_time=$(date +%s)
-                        run_time=$((whisper_end_time - whisper_start_time))
+                whisper_start_time=$(date +%s)
+                whisperx --batch_size 12 --model $TRANSCRIPTION_MODEL --language fr --compute_type float32 --output_dir "$new_dir" > "$new_dir/$base_name.txt" "$audio_file"
+                whisper_end_time=$(date +%s)
+                run_time=$((whisper_end_time - whisper_start_time))
             fi
 
             # Move all files with the same base_name to the new subdirectory
             mv "$incoming_dir$base_name"* "$new_dir/"
 
-            # Migrate this process to ts-control.sh as auto-summary.py
             # Create the summary.txt file from the newly created srt file by sending it to ts-gpt or another ollama api endpoint
             # ts-gpt can be enabled in the docker-compose.yml - if using ts-gpt, your url should be http://172.30.1.3:11434
-        #    python3 /root/scripts/ts-summarize.py "$new_dir" http://172.30.1.3:11434
+            python3 /root/scripts/ts-summarize.py "$new_dir" http://172.30.1.3:11434
 
             # Change the owner of the files to the user transcriptionstream
             chown -R transcriptionstream:transcriptionstream "$new_dir"

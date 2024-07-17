@@ -3,6 +3,8 @@ from werkzeug.utils import secure_filename
 import os
 import shutil
 from datetime import datetime
+from moviepy.editor import VideoFileClip
+
 
 app = Flask(__name__)
 # Use the TS_WEB_SECRET_KEY environment variable as the secret key, and the fallback
@@ -11,6 +13,7 @@ app.secret_key = os.environ.get('TS_WEB_SECRET_KEY', 'some_secret_key')
 TRANSCRIBED_FOLDER = '/transcriptionstream/transcribed'
 UPLOAD_FOLDER = '/transcriptionstream/incoming'
 ALLOWED_EXTENSIONS = set(['mp3', 'wav', 'ogg', 'flac'])
+VIDEO_EXTENSIONS = set(['mp4', 'webm'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -19,6 +22,20 @@ session_start_time = datetime.now()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def convert_to_mp3(input_file, output_file):
+    # Load the video file
+    video = VideoFileClip(input_file)
+    
+    # Extract audio
+    audio = video.audio
+    
+    # Write the audio to a file
+    audio.write_audiofile(output_file)
+
+    # Close the video and audio clips
+    audio.close()
+    video.close()
 
 
 @app.route('/')
@@ -72,8 +89,14 @@ def upload_file():
         file = request.files['file']
         if file.filename == '':
             return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+        filename = secure_filename(file.filename)
+        if '.' in filename and filename.rsplit('.', 1)[1].lower() in VIDEO_EXTENSIONS:
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            new_filename = f"{filename.rsplit('.', 1)[0]}.mp3"
+            convert_to_mp3(str(os.path.join(app.config['UPLOAD_FOLDER'], filename)), str(os.path.join(app.config['UPLOAD_FOLDER'], new_filename)))
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return render_template('upload.html', message="File uploaded successfully! Redirecting - you will be notified once the transcription is complete", redirect=True)
+        if file and allowed_file(filename):
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return render_template('upload.html', message="File uploaded successfully! Redirecting - you will be notified once the transcription is complete", redirect=True)
     return render_template('upload.html')
@@ -88,7 +111,13 @@ def upload_transcribe():
     if file:
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'transcribe', filename))
-        return render_template('upload.html', message="File uploaded successfully to Transcribe!")
+        if '.' in filename and filename.rsplit('.', 1)[1].lower() in VIDEO_EXTENSIONS:
+            print("Converting file mp3 :", filename)
+            new_filename = f"{filename.rsplit('.', 1)[0]}.mp3"
+            convert_to_mp3(str(os.path.join(app.config['UPLOAD_FOLDER'], 'transcribe', filename)), str(os.path.join(app.config['UPLOAD_FOLDER'], 'transcribe', new_filename)))
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], 'transcribe', filename))
+            return render_template('upload.html', message="File uploaded successfully to Transcribe!", redirect=True)
+        return render_template('upload.html', message="File uploaded successfully to Transcribe!", redirect=True)
 
 @app.route('/upload_diarize', methods=['POST'])
 def upload_diarize():
@@ -100,7 +129,13 @@ def upload_diarize():
     if file:
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'diarize', filename))
-        return render_template('upload.html', message="File uploaded successfully to Diarize!")
+        if '.' in filename and filename.rsplit('.', 1)[1].lower() in VIDEO_EXTENSIONS:
+            print("Converting file mp3 :", filename)
+            new_filename = f"{filename.rsplit('.', 1)[0]}.mp3"
+            convert_to_mp3(str(os.path.join(app.config['UPLOAD_FOLDER'], 'diarize', filename)), str(os.path.join(app.config['UPLOAD_FOLDER'], 'diarize', new_filename)))
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], 'diarize', filename))
+            return render_template('upload.html', message="File uploaded successfully to Diarize!", redirect=True)
+        return render_template('upload.html', message="File uploaded successfully to Diarize!", redirect=True)
 
 
 @app.route('/check_alert', methods=['GET'])
